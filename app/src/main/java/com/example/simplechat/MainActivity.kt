@@ -1,5 +1,6 @@
 package com.example.simplechat
 
+import UserAdapter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -82,6 +83,10 @@ class MainActivity : AppCompatActivity() {
             mAuth.signOut()
             finish()
             moveTo(this@MainActivity,Login::class.java)
+            return true
+        }
+        if(item.itemId==R.id.search){
+            moveTo(this@MainActivity,SearchUsers::class.java)
             return true
         }
         return true
