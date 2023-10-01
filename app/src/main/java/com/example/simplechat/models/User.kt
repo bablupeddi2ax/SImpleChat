@@ -1,4 +1,4 @@
-package com.example.simplechat
+package com.example.simplechat.models
 /**
  * Data class representing a user in the chat application.
  *

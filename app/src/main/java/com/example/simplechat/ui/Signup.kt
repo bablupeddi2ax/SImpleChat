@@ -1,12 +1,17 @@
-package com.example.simplechat
+package com.example.simplechat.ui
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import com.example.simplechat.R
+import com.example.simplechat.Utils
+import com.example.simplechat.models.User
+import com.example.simplechat.ValidationResult
+import com.example.simplechat.validateEmail
+import com.example.simplechat.validatePassword
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -38,6 +43,7 @@ class Signup : AppCompatActivity() {
     private lateinit var btnSignup: Button
     private lateinit var mAuth: FirebaseAuth
     private lateinit var mDbRef:DatabaseReference
+    private lateinit var utils: Utils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +61,7 @@ class Signup : AppCompatActivity() {
         //initialize auth and database reference
         mAuth = FirebaseAuth.getInstance()
         mDbRef = FirebaseDatabase.getInstance().reference
-
+        utils = Utils()
         // set on click listener for signup button
         btnSignup.setOnClickListener{
             // remove extra spaces to avoid problems that might occur when user enter his details further
@@ -85,7 +91,7 @@ class Signup : AppCompatActivity() {
                     addUserToDb(name,email,mAuth.currentUser?.uid!!)
 
                     // navigate to MainActivity
-                    moveTo(this@Signup,MainActivity::class.java)
+                    utils.moveTo(this@Signup, MainActivity::class.java)
 
                     //finish the activity so that user accidentally will not be able to redirected to signup again
                     finish()
@@ -108,7 +114,7 @@ class Signup : AppCompatActivity() {
     private fun validateInputs(name: String, emailValidation: ValidationResult, passwordValidation: ValidationResult): Boolean {
         // Validate Name
         if (name.isEmpty()) {
-            showToast("Please enter your name.",this@Signup)
+            utils.showToast("Please enter your name.",this@Signup)
             return false
         }
 
@@ -116,7 +122,7 @@ class Signup : AppCompatActivity() {
         when (emailValidation) {
             is ValidationResult.Success -> { }
             is ValidationResult.Error -> {
-                showToast(emailValidation.message,this@Signup)
+                utils.showToast(emailValidation.message,this@Signup)
                 return false
             }
         }
@@ -125,7 +131,7 @@ class Signup : AppCompatActivity() {
         when (passwordValidation) {
             is ValidationResult.Success -> { }
             is ValidationResult.Error -> {
-                showToast(passwordValidation.message,this@Signup)
+                utils.showToast(passwordValidation.message,this@Signup)
                 return false
             }
         }

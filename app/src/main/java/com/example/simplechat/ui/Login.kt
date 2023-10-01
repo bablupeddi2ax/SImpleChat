@@ -1,10 +1,14 @@
-package com.example.simplechat
+package com.example.simplechat.ui
 
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.ViewModelProvider
+import com.example.simplechat.models.LoginViewModel
+import com.example.simplechat.R
+import com.example.simplechat.Utils
+import com.example.simplechat.ValidationResult
 
 /**
  * Features
@@ -27,7 +31,8 @@ class Login : AppCompatActivity() {
     private lateinit var edtPassword: EditText
     private lateinit var btnLogin: Button
     private lateinit var btnSignup: Button
-    private lateinit var mAuth: FirebaseAuth
+    private lateinit var utils: Utils
+    private lateinit var viewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,50 +46,35 @@ class Login : AppCompatActivity() {
         edtPassword = findViewById(R.id.edtPassword)
         btnLogin = findViewById(R.id.btn_login)
         btnSignup = findViewById(R.id.btn_signup)
-
-        // initialize firebase auth
-        mAuth = FirebaseAuth.getInstance()
-
+        utils = Utils()
+        viewModel = ViewModelProvider(this)[LoginViewModel::class.java]
+        viewModel.loginResult.observe(this) { result ->
+            when (result) {
+                is ValidationResult.Success -> {
+                    // Handle a successful login (e.g., navigate to the next screen)
+                    utils.moveTo(this@Login,MainActivity::class.java)
+                    finish()
+                }
+                is ValidationResult.Error -> {
+                    // Handle a failed login (e.g., display an error message)
+                    utils.showToast("user does not exists!",this@Login)
+                }
+            }
+        }
         // navigate to Signup Screen (user does not have an account)
         btnSignup.setOnClickListener {
-            moveTo(this@Login,Signup::class.java)
+            utils.moveTo(this@Login, Signup::class.java)
         }
-
         // validate and login with provided credentials
         btnLogin.setOnClickListener {
             // get email and password
             val email = edtEmail.text.toString()
             val password = edtPassword.text.toString()
             // check if they are valid
-            if(!validate(email,password)) {
-                showToast("enter details correctly",this@Login)
-            }else{
-                login(email, password)
-            }
+            viewModel.login(email,password)
         }
-
-    }
-    // login method
-    private fun login(email: String, password: String) {
-        // firebase sign in method
-        mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // navigate to main activity
-                    moveTo(this@Login, MainActivity::class.java)
-                    // to make login screen  no longer active in the background finish()
-                    finish()
-                } else {
-                    // show toast if task is not successful
-                    showToast("user does not exists!", this@Login)
-                }
-            }
     }
 
-    //method for validation return true if both email and password are not blank
-    private fun validate(email: String, password: String):Boolean {
-        return email.isNotBlank() && password.isNotBlank()
-    }
 
 }
 

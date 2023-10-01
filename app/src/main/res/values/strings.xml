@@ -6,4 +6,5 @@
     <string name="signup">Signup</string>
     <string name="name">Name</string>
     <string name="type_username_to_search">type username to search</string>
+    <string name="msg_token_fmt">token</string>
 </resources>
